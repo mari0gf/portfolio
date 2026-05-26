@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MARIO / PORTFOLIO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080C10;
+    --bg2: #0D1117;
+    --bg3: #161B22;
+    --border: #21262D;
+    --green: #3FB950;
+    --green-dim: #1A3B22;
+    --red: #F85149;
+    --yellow: #D29922;
+    --blue: #58A6FF;
+    --purple: #BC8CFF;
+    --text: #E6EDF3;
+    --text-dim: #7D8590;
+    --text-muted: #484F58;
+    --accent: #3FB950;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* Scanline effect */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* Header */
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 52px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 100;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-mark {
+    width: 28px; height: 28px;
+    background: var(--green);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: #000;
+  }
+
+  .logo-text { font-size: 12px; font-weight: 500; letter-spacing: 0.1em; color: var(--text); }
+  .logo-sub { font-size: 10px; color: var(--text-dim); letter-spacing: 0.08em; }
+
+  nav { display: flex; gap: 0; }
+  nav a {
+    padding: 0 16px;
+    height: 52px;
+    display: flex; align-items: center;
+    text-decoration: none;
+    color: var(--text-dim);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    transition: color 0.2s;
+    border-bottom: 2px solid transparent;
+  }
+  nav a:hover { color: var(--text); }
+  nav a.active { color: var(--green); border-bottom-color: var(--green); }
+
+  .header-right {
+    display: flex; align-items: center; gap: 16px;
+  }
+
+  .live-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .timestamp { font-size: 10px; color: var(--text-dim); }
+
+  /* Ticker bar */
+  .ticker-bar {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 6px 32px;
+    display: flex;
+    gap: 32px;
+    overflow: hidden;
+    font-size: 11px;
+  }
+
+  .ticker-item { display: flex; gap: 8px; align-items: center; white-space: nowrap; }
+  .ticker-sym { color: var(--text-dim); }
+  .ticker-price { color: var(--text); font-weight: 500; }
+  .ticker-chg.pos { color: var(--green); }
+  .ticker-chg.neg { color: var(--red); }
+
+  /* Main layout */
+  main { padding: 24px 32px; max-width: 1400px; margin: 0 auto; }
+
+  /* Section headers */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-title {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+  .section-line { flex: 1; height: 1px; background: var(--border); }
+
+  /* KPI cards */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 32px;
+  }
+
+  .kpi-card {
+    background: var(--bg2);
+    padding: 20px;
+    transition: background 0.2s;
+  }
+  .kpi-card:hover { background: var(--bg3); }
+
+  .kpi-label {
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .kpi-value {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .kpi-sub {
+    font-size: 10px;
+    color: var(--text-dim);
+  }
+
+  .kpi-value.green { color: var(--green); }
+  .kpi-value.yellow { color: var(--yellow); }
+
+  /* Portfolio table */
+  .portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 32px;
+  }
+
+  .position-card {
+    background: var(--bg2);
+    padding: 18px 20px;
+    display: grid;
+    grid-template-columns: 36px 1fr auto;
+    gap: 0 14px;
+    align-items: start;
+    transition: background 0.2s;
+    cursor: default;
+    border-left: 3px solid transparent;
+  }
+
+  .position-card:hover { background: var(--bg3); }
+  .position-card.core { border-left-color: var(--blue); }
+  .position-card.growth { border-left-color: var(--purple); }
+  .position-card.satellite { border-left-color: var(--yellow); }
+
+  .pos-num {
+    font-size: 10px;
+    color: var(--text-muted);
+    padding-top: 2px;
+  }
+
+  .pos-ticker {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.02em;
+    margin-bottom: 2px;
+  }
+
+  .pos-name {
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+
+  .pos-thesis {
+    font-size: 10px;
+    color: var(--text-dim);
+    font-family: 'IBM Plex Sans', sans-serif;
+    line-height: 1.5;
+    border-left: 2px solid var(--border);
+    padding-left: 8px;
+    margin-top: 4px;
+  }
+
+  .pos-tags {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+
+  .tag {
+    font-size: 9px;
+    padding: 2px 6px;
+    letter-spacing: 0.06em;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+
+  .tag.ethical { border-color: var(--green-dim); color: var(--green); }
+
+  .pos-right { text-align: right; }
+
+  .pos-weight {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.02em;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .pos-potential {
+    font-size: 11px;
+    color: var(--green);
+    font-weight: 500;
+  }
+
+  .pos-potential.warn { color: var(--yellow); }
+
+  .pos-beta {
+    font-size: 9px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .weight-bar-wrap {
+    grid-column: 1 / -1;
+    margin-top: 10px;
+  }
+
+  .weight-bar-bg {
+    height: 2px;
+    background: var(--border);
+    position: relative;
+  }
+
+  .weight-bar-fill {
+    height: 100%;
+    background: var(--green);
+    transition: width 0.8s ease;
+  }
+
+  .position-card.core .weight-bar-fill { background: var(--blue); }
+  .position-card.growth .weight-bar-fill { background: var(--purple); }
+  .position-card.satellite .weight-bar-fill { background: var(--yellow); }
+
+  /* Projection table */
+  .proj-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .panel {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 20px;
+  }
+
+  .panel-title {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .scenario-row {
+    display: grid;
+    grid-template-columns: 1fr repeat(3, auto);
+    gap: 0 24px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+  }
+
+  .scenario-row:last-child { border-bottom: none; }
+
+  .scenario-label { font-size: 11px; color: var(--text-dim); }
+  .scenario-val {
+    font-size: 13px;
+    font-weight: 500;
+    text-align: right;
+  }
+
+  .scenario-val.bear { color: var(--red); }
+  .scenario-val.base { color: var(--green); }
+  .scenario-val.bull { color: var(--blue); }
+
+  .scenario-header {
+    display: grid;
+    grid-template-columns: 1fr repeat(3, auto);
+    gap: 0 24px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 4px;
+  }
+
+  .scenario-header span {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    text-align: right;
+  }
+
+  /* Ethics panel */
+  .ethics-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .ethics-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ethics-item:last-child { border-bottom: none; }
+
+  .ethics-x {
+    font-size: 11px;
+    color: var(--red);
+    font-weight: 600;
+    width: 12px;
+  }
+
+  .ethics-text { font-size: 11px; color: var(--text-dim); font-family: 'IBM Plex Sans', sans-serif; }
+
+  /* Blog section */
+  .blog-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 32px;
+  }
+
+  .blog-card {
+    background: var(--bg2);
+    padding: 24px;
+    transition: background 0.2s;
+    cursor: pointer;
+  }
+
+  .blog-card:hover { background: var(--bg3); }
+
+  .blog-date {
+    font-size: 9px;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    margin-bottom: 10px;
+  }
+
+  .blog-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.4;
+    margin-bottom: 10px;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+
+  .blog-excerpt {
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.6;
+    font-family: 'IBM Plex Sans', sans-serif;
+    margin-bottom: 16px;
+  }
+
+  .blog-tag {
+    display: inline-block;
+    font-size: 9px;
+    padding: 3px 8px;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+  }
+
+  .blog-tag.green { border-color: var(--green-dim); color: var(--green); }
+  .blog-tag.blue { border-color: #1B2F4B; color: var(--blue); }
+  .blog-tag.yellow { border-color: #3B2E0A; color: var(--yellow); }
+
+  /* Metrics row */
+  .metrics-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+
+  .metric-cell {
+    background: var(--bg2);
+    padding: 14px 16px;
+  }
+
+  .metric-label {
+    font-size: 9px;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .metric-val { font-size: 16px; font-weight: 600; color: var(--text); }
+  .metric-sub { font-size: 10px; color: var(--text-dim); margin-top: 2px; }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 16px;
+    align-items: center;
+  }
+
+  .legend-item { display: flex; gap: 6px; align-items: center; font-size: 10px; color: var(--text-dim); }
+  .legend-dot { width: 8px; height: 8px; }
+  .legend-dot.core { background: var(--blue); }
+  .legend-dot.growth { background: var(--purple); }
+  .legend-dot.satellite { background: var(--yellow); }
+
+  /* Footer */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 20px 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .footer-left { font-size: 10px; color: var(--text-muted); line-height: 1.8; }
+  .footer-right { font-size: 10px; color: var(--text-muted); text-align: right; line-height: 1.8; }
+
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .position-card, .kpi-card, .blog-card {
+    animation: fadeIn 0.4s ease both;
+  }
+
+  .position-card:nth-child(1) { animation-delay: 0.05s; }
+  .position-card:nth-child(2) { animation-delay: 0.10s; }
+  .position-card:nth-child(3) { animation-delay: 0.15s; }
+  .position-card:nth-child(4) { animation-delay: 0.20s; }
+  .position-card:nth-child(5) { animation-delay: 0.25s; }
+  .position-card:nth-child(6) { animation-delay: 0.30s; }
+  .position-card:nth-child(7) { animation-delay: 0.35s; }
+  .position-card:nth-child(8) { animation-delay: 0.40s; }
+  .position-card:nth-child(9) { animation-delay: 0.45s; }
+  .position-card:nth-child(10) { animation-delay: 0.50s; }
+
+  /* Highlight box */
+  .highlight-row {
+    background: var(--green-dim);
+    border: 1px solid #2EA043;
+    padding: 10px 16px;
+    margin-bottom: 20px;
+    font-size: 11px;
+    color: var(--green);
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .highlight-label { color: #2EA043; font-weight: 600; }
+
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header>
+  <div class="logo">
+    <div class="logo-mark">M</div>
+    <div>
+      <div class="logo-text">MARIO PORTFOLIO</div>
+      <div class="logo-sub">LONG-TERM · ETHICAL · GLOBAL</div>
+    </div>
+  </div>
+  <nav>
+    <a href="#portfolio" class="active">PORTFOLIO</a>
+    <a href="#proyecciones">PROYECTIONS</a>
+    <a href="#blog">DIARY</a>
+  </nav>
+  <div class="header-right">
+    <div class="live-dot"></div>
+    <div class="timestamp" id="clock">MAY 26, 2026 · 09:41 CET</div>
+  </div>
+</header>
+
+<!-- Ticker -->
+<div class="ticker-bar">
+  <div class="ticker-item"><span class="ticker-sym">MSFT</span><span class="ticker-price">395.20</span><span class="ticker-chg neg">-0.44%</span></div>
+  <div class="ticker-item"><span class="ticker-sym">V</span><span class="ticker-price">312.50</span><span class="ticker-chg pos">+0.21%</span></div>
+  <div class="ticker-item"><span class="ticker-sym">TSM</span><span class="ticker-price">338.10</span><span class="ticker-chg neg">-1.20%</span></div>
+  <div class="ticker-item"><span class="ticker-sym">FER.BME</span><span class="ticker-price">55.94</span><span class="ticker-chg pos">+0.63%</span></div>
+  <div class="ticker-item"><span class="ticker-sym">RACE</span><span class="ticker-price">350.40</span><span class="ticker-chg pos">+0.18%</span></div>
+  <div class="ticker-item"><span class="ticker-sym">ADBE</span><span class="ticker-price">249.00</span><span class="ticker-chg neg">-0.30%</span></div>
+  <div class="ticker-item"><span class="ticker-sym">FIG</span><span class="ticker-price">26.10</span><span class="ticker-chg pos">+13.40%</span></div>
+  <div class="ticker-item"><span class="ticker-sym">VEEV</span><span class="ticker-price">191.30</span><span class="ticker-chg pos">+0.55%</span></div>
+  <div class="ticker-item"><span class="ticker-sym">ELF</span><span class="ticker-price">80.20</span><span class="ticker-chg neg">-0.25%</span></div>
+  <div class="ticker-item"><span class="ticker-sym">RKLB</span><span class="ticker-price">70.40</span><span class="ticker-chg pos">+46.20%</span></div>
+</div>
+
+<!-- Main -->
+<main>
+
+  <!-- KPIs -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Total invested capital</div>
+      <div class="kpi-value">$116</div>
+      <div class="kpi-sub">Start · February 2026</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Monthly contribution</div>
+      <div class="kpi-value">$20</div>
+      <div class="kpi-sub">vía DCA</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Potential 12m</div>
+      <div class="kpi-value green">+38.8%</div>
+      <div class="kpi-sub">Analysts' consensus</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Beta portfolio</div>
+      <div class="kpi-value yellow">1.23</div>
+      <div class="kpi-sub">Slightly offensive</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Positions</div>
+      <div class="kpi-value">10</div>
+      <div class="kpi-sub">8 sectors · 3 blocks</div>
+    </div>
+  </div>
+
+  <!-- Portfolio -->
+  <div id="portfolio" class="section-header">
+    <span class="section-title">Actual portfolio</span>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot core"></div>Defensive core</div>
+    <div class="legend-item"><div class="legend-dot growth"></div>Growth core</div>
+    <div class="legend-item"><div class="legend-dot satellite"></div>Satellites</div>
+  </div>
+
+  <div class="portfolio-grid">
+
+    <!-- MSFT -->
+    <div class="position-card growth">
+      <div class="pos-num">05</div>
+      <div>
+        <div class="pos-ticker">MSFT</div>
+        <div class="pos-name">Microsoft Corp. · Nasdaq</div>
+        <div class="pos-thesis">Core software. Highest conviction position. In the 14th percentile of annual ranking with Azure AI growing +37% YoY and Copilot with 200M paid seats. The market has punished it for the massive CapEx in AI—fundamentals don't justify it.</div>
+        <div class="pos-tags">
+          <span class="tag">SOFTWARE</span>
+          <span class="tag">CLOUD</span>
+          <span class="tag">AI</span>
+        </div>
+      </div>
+      <div class="pos-right">
+        <div class="pos-weight">25%</div>
+        <div class="pos-potential">+50% obj.</div>
+        <div class="pos-beta">β 0.93</div>
+      </div>
+      <div class="weight-bar-wrap">
+        <div class="weight-bar-bg"><div class="weight-bar-fill" style="width:100%"></div></div>
+      </div>
+    </div>
+
+    <!-- VISA -->
+    <div class="position-card growth">
+      <div class="pos-num">04</div>
+      <div>
+        <div class="pos-ticker">V</div>
+        <div class="pos-name">Visa Inc. · NYSE</div>
+        <div class="pos-thesis">Global financial toll. Charges for each transaction without assuming credit risk. A virtually indestructible moat given the network effect of 4.4 billion cards. Low-volatility anchor of the core.</div>
+        <div class="pos-tags">
+          <span class="tag">FINTECH</span>
+          <span class="tag">DIVIDEND</span>
+        </div>
+      </div>
+      <div class="pos-right">
+        <div class="pos-weight">15%</div>
+        <div class="pos-potential">+12% obj.</div>
+        <div class="pos-beta">β 0.87</div>
+      </div>
+      <div class="weight-bar-wrap">
+        <div class="weight-bar-bg"><div class="weight-bar-fill" style="width:60%"></div></div>
+      </div>
+    </div>
+
+    <!-- TSM -->
+    <div class="position-card growth">
+      <div class="pos-num">07</div>
+      <div>
+        <div class="pos-ticker">TSM</div>
+        <div class="pos-name">Taiwan Semiconductor · NYSE</div>
+        <div class="pos-thesis">The physical link in the AI ​​value chain. It manufactures chips for Nvidia, Apple, and Broadcom. Growth +19% YoY at a P/E ratio of 19x—cheap for its quality. Geopolitical risk in Taiwan is actively monitored.</div>
+        <div class="pos-tags">
+          <span class="tag">SEMICONDUCTORS</span>
+          <span class="tag">ASIA</span>
+          <span class="tag">AI HARDWARE</span>
+        </div>
+      </div>
+      <div class="pos-right">
+        <div class="pos-weight">15%</div>
+        <div class="pos-potential">+27% obj.</div>
+        <div class="pos-beta">β 1.12</div>
+      </div>
+      <div class="weight-bar-wrap">
+        <div class="weight-bar-bg"><div class="weight-bar-fill" style="width:60%"></div></div>
+      </div>
+    </div>
+
+    <!-- FER -->
+    <div class="position-card core">
+      <div class="pos-num">03</div>
+      <div>
+        <div class="pos-ticker">FER</div>
+        <div class="pos-name">Ferrovial SE · BME / NYSE</div>
+        <div class="pos-thesis">Long-term international infrastructure. Toll highways, airports, and concessions in the US, Canada, and the UK. Predictable cash flows and euro diversification. Purchased on the BME stock exchange to mitigate currency risk.</div>
+        <div class="pos-tags">
+          <span class="tag">INFRAESTRUCTURE</span>
+          <span class="tag">EUROPE</span>
+          <span class="tag">DIVIDEND</span>
+        </div>
+      </div>
+      <div class="pos-right">
+        <div class="pos-weight">8%</div>
+        <div class="pos-potential warn">+7% obj.</div>
+        <div class="pos-beta">β 0.92</div>
+      </div>
+      <div class="weight-bar-wrap">
+        <div class="weight-bar-bg"><div class="weight-bar-fill" style="width:32%"></div></div>
+      </div>
+    </div>
+
+    <!-- RACE -->
+    <div class="position-card growth">
+      <div class="pos-num">06</div>
+      <div>
+        <div class="pos-ticker">RACE</div>
+        <div class="pos-name">Ferrari NV · NYSE</div>
+        <div class="pos-thesis">Luxury with software margins. 39% EBITDA, years-long waiting list, unique pricing power. Deliberate exclusivity is the most powerful moat in the consumer sector. Beta of 0.55—more defensive than it looks.</div>
+        <div class="pos-tags">
+          <span class="tag">LUXURY</span>
+          <span class="tag">CYCLICAL CONSUMPTION</span>
+          <span class="tag">EUROPE</span>
+        </div>
+      </div>
+      <div class="pos-right">
+        <div class="pos-weight">8%</div>
+        <div class="pos-potential">+29% obj.</div>
+        <div class="pos-beta">β 0.55</div>
+      </div>
+      <div class="weight-bar-wrap">
+        <div class="weight-bar-bg"><div class="weight-bar-fill" style="width:32%"></div></div>
+      </div>
+    </div>
+
+    <!-- ADBE -->
+    <div class="position-card satellite">
+      <div class="pos-num">10</div>
+      <div>
+        <div class="pos-ticker">ADBE</div>
+        <div class="pos-name">Adobe Inc. · Nasdaq</div>
+        <div class="pos-thesis">Classic turnaround. The market punishes it due to AI fears—its results refute this. Gross margin 89%, record FCF of $2.96 billion. The Firefly integration turns risk into a catalyst. 41% drop from highs with no operational deterioration.</div>
+        <div class="pos-tags">
+          <span class="tag">TURNAROUND</span>
+          <span class="tag">SaaS</span>
+          <span class="tag">AI</span>
+        </div>
+      </div>
+      <div class="pos-right">
+        <div class="pos-weight">8%</div>
+        <div class="pos-potential">+33% obj.</div>
+        <div class="pos-beta">β 1.26</div>
+      </div>
+      <div class="weight-bar-wrap">
+        <div class="weight-bar-bg"><div class="weight-bar-fill" style="width:32%"></div></div>
+      </div>
+    </div>
+
+    <!-- FIG -->
+    <div class="position-card satellite">
+      <div class="pos-num">08</div>
+      <div>
+        <div class="pos-ticker">FIG</div>
+        <div class="pos-name">Figma Inc. · NYSE</div>
+        <div class="pos-thesis">Post-IPO SaaS. The collaborative design platform that's becoming the operating system for product development. Q1 2026: +46% revenue, NDR 139%. AI is its catalyst, not its threat. AI credit monetization exceeded internal targets.</div>
+        <div class="pos-tags">
+          <span class="tag">SaaS</span>
+          <span class="tag">POST-IPO</span>
+          <span class="tag">AI</span>
+        </div>
+      </div>
+      <div class="pos-right">
+        <div class="pos-weight">6%</div>
+        <div class="pos-potential">+78% obj.</div>
+        <div class="pos-beta">β ~1.80</div>
+      </div>
+      <div class="weight-bar-wrap">
+        <div class="weight-bar-bg"><div class="weight-bar-fill" style="width:24%"></div></div>
+      </div>
+    </div>
+
+    <!-- VEEV -->
+    <div class="position-card core">
+      <div class="pos-num">02</div>
+      <div>
+        <div class="pos-ticker">VEEV</div>
+        <div class="pos-name">Veeva Systems · NYSE</div>
+        <div class="pos-thesis">Mission-critical software for the pharmaceutical industry — CRM, clinical trials, regulatory compliance. The moat for switching is almost absolute: no pharmaceutical company migrates from Veeva easily. 27% year-over-year growth with +62% potential.</div>
+        <div class="pos-tags">
+          <span class="tag">HEALTH</span>
+          <span class="tag">SaaS</span>
+        </div>
+      </div>
+      <div class="pos-right">
+        <div class="pos-weight">6%</div>
+        <div class="pos-potential">+62% obj.</div>
+        <div class="pos-beta">β 0.72</div>
+      </div>
+      <div class="weight-bar-wrap">
+        <div class="weight-bar-bg"><div class="weight-bar-fill" style="width:24%"></div></div>
+      </div>
+    </div>
+
+    <!-- ELF -->
+    <div class="position-card core">
+      <div class="pos-num">01</div>
+      <div>
+        <div class="pos-ticker">ELF</div>
+        <div class="pos-name">e.l.f. Beauty · NYSE</div>
+        <div class="pos-thesis">28 consecutive quarters of growth, 22% market share in facial makeup. Reducing dependence on China from 100% to 10% by 2026. The $800M acquisition of Rhode (Hailey Bieber) is the catalyst to watch.</div>
+        <div class="pos-tags">
+          <span class="tag">DEFENSIVE CONSUMPTION</span>
+          <span class="tag ethical">CRUELTY-FREE</span>
+        </div>
+      </div>
+      <div class="pos-right">
+        <div class="pos-weight">6%</div>
+        <div class="pos-potential">+40% obj.</div>
+        <div class="pos-beta">β 1.87</div>
+      </div>
+      <div class="weight-bar-wrap">
+        <div class="weight-bar-bg"><div class="weight-bar-fill" style="width:24%"></div></div>
+      </div>
+    </div>
+
+    <!-- RKLB -->
+    <div class="position-card satellite">
+      <div class="pos-num">09</div>
+      <div>
+        <div class="pos-ticker">RKLB</div>
+        <div class="pos-name">Rocket Lab USA · Nasdaq</div>
+        <div class="pos-thesis">Deep Tech Narrative. The only viable alternative to SpaceX in private launchers. Q1 2026: $200M revenue +63% YoY, $2.2 billion backlog (+108%). Neutron in Q4 2026. Not valued on fundamentals—valued on whether the commercial space is real this decade.</div>
+        <div class="pos-tags">
+          <span class="tag">SPACE</span>
+          <span class="tag">DEEP TECH</span>
+          <span class="tag">NARRATIVE</span>
+        </div>
+      </div>
+      <div class="pos-right">
+        <div class="pos-weight">3%</div>
+        <div class="pos-potential">+29% obj.</div>
+        <div class="pos-beta">β 2.26</div>
+      </div>
+      <div class="weight-bar-wrap">
+        <div class="weight-bar-bg"><div class="weight-bar-fill" style="width:12%"></div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Proyections -->
+  <div id="proyections" class="section-header">
+    <span class="section-title">Proyections</span>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="proj-section">
+    <div class="panel">
+      <div class="panel-title">DCA possible scenarios</div>
+      <div class="scenario-header">
+        <span>Escenario</span>
+        <span>1 year</span>
+        <span>3 years</span>
+        <span>5 years</span>
+      </div>
+      <div class="scenario-row">
+        <span class="scenario-label">Bearish · ~5% CAGR</span>
+        <span class="scenario-val bear">€290</span>
+        <span class="scenario-val bear">€870</span>
+        <span class="scenario-val bear">€1.560</span>
+      </div>
+      <div class="scenario-row">
+        <span class="scenario-label">Baseline · ~15% CAGR</span>
+        <span class="scenario-val base">€360</span>
+        <span class="scenario-val base">€1.280</span>
+        <span class="scenario-val base">€2.600</span>
+      </div>
+      <div class="scenario-row">
+        <span class="scenario-label">Bullish · ~25% CAGR</span>
+        <span class="scenario-val bull">€400</span>
+        <span class="scenario-val bull">€1.750</span>
+        <span class="scenario-val bull">€4.200</span>
+      </div>
+    </div>
+
+  <!-- Métricas clave -->
+  <div class="metrics-row">
+    <div class="metric-cell">
+      <div class="metric-label">Portfolio potencial 12m</div>
+      <div class="metric-val" style="color:var(--green)">+38.8%</div>
+      <div class="metric-sub">Weighted analysts consensus</div>
+    </div>
+    <div class="metric-cell">
+      <div class="metric-label">Weighted beta</div>
+      <div class="metric-val" style="color:var(--yellow)">1.23</div>
+      <div class="metric-sub">For every -10% of the S&P: -12.3%</div>
+    </div>
+    <div class="metric-cell">
+      <div class="metric-label">Discount rate</div>
+      <div class="metric-val">12%</div>
+      <div class="metric-sub">7-8% en defensive core</div>
+    </div>
+    <div class="metric-cell">
+      <div class="metric-label">Markets</div>
+      <div class="metric-val">3</div>
+      <div class="metric-sub">NYSE/Nasdaq · BME · Taiwán ADR</div>
+    </div>
+  </div>
+
+  <!-- Blog / Diario -->
+  <div id="blog" class="section-header">
+    <span class="section-title">Investment diary</span>
+    <div class="section-line"></div>
+  </div>
+
+  <div class="blog-grid">
+    <div class="blog-card">
+      <div class="blog-date">MAY 26, 2026</div>
+      <div class="blog-title">RKLB +46% post-earnings: the commercial space thesis is confirmed</div>
+      <div class="blog-excerpt">Rocket Lab reported $200 million in revenue (+63% YoY), a $2.2 billion backlog, and Neutron slated for Q4 2026. The market reacted with a 46% surge. We're not selling—the thesis not only holds, it's accelerated.</div>
+      <span class="blog-tag green">EARNINGS</span>
+    </div>
+    <div class="blog-card">
+      <div class="blog-date">MAY 26, 2026</div>
+      <div class="blog-title">Figma Q1 2026: When code is a commodity, design is the advantage</div>
+      <div class="blog-excerpt">FIG reported a 46% increase in growth, accelerating for the second consecutive quarter, a 139% NDR, and AI monetization exceeding targets. This confirms the thesis that AI is Figma's catalyst, not its threat.</div>
+      <span class="blog-tag blue">EARNINGS</span>
+    </div>
+
+</main>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-left">
+    MARIO PORTFOLIO · ASTURIAS · ESPAÑA<br>
+    Update: Mayo 2026 · Broker: Trading 212 · Contribution vía DCA
+  </div>
+  <div class="footer-right">
+    This site is for informational and personal purposes.<br>
+    This is not financial advice. Past performance is not indicative of future results.
+  </div>
+</footer>
+
+<script>
+  // Live clock
+  function updateClock() {
+    const now = new Date();
+    const opts = { month: 'short', day: '2-digit', year: 'numeric' };
+    const date = now.toLocaleDateString('en-US', opts).toUpperCase();
+    const time = now.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('clock').textContent = `${date} · ${time} CET`;
+  }
+  updateClock();
+  setInterval(updateClock, 10000);
+
+  // Smooth scroll nav
+  document.querySelectorAll('nav a').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      document.querySelectorAll('nav a').forEach(x => x.classList.remove('active'));
+      a.classList.add('active');
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  });
+
+  // Animate weight bars on load
+  window.addEventListener('load', () => {
+    document.querySelectorAll('.weight-bar-fill').forEach(bar => {
+      const w = bar.style.width;
+      bar.style.width = '0';
+      setTimeout(() => { bar.style.width = w; }, 300);
+    });
+  });
+</script>
+</body>
+</html>
